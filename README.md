@@ -32,7 +32,7 @@ Na próxima semana, nosso conteúdo técnico será uma live onde o professor far
 
 [x] Consumir API de exemplo
 [x] Exibir dados na tela
-[ ] Filtro por preço
+[x] Filtro por preço
 [ ] Valor total
 [ ] Nova API
 [ ] Exibir mapa

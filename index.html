@@ -1,11 +1,49 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AirBnb - Gama Academy</title>
+    <style>
+        .prices {
+            position: relative;
+        }
+
+        input[type="range"] {
+            position: absolute;
+            pointer-events: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            position: relative;
+            pointer-events: all;
+            z-index: 1;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            position: relative;
+            pointer-events: all;
+            z-index: 1;
+        }
+
+        input[type="range"]::-ms-thumb {
+            position: relative;
+            pointer-events: all;
+            z-index: 1;
+        }
+    </style>
 </head>
+
 <body>
+    <div class="filters">
+        <div class="prices">
+            <label>Preços</label>
+            <span class="price_range"></span>
+            <input type="range" name="prices[]">
+            <input type="range" name="prices[]">
+        </div>
+    </div>
     <div class="properties">
         <div class="property">
             <figure class="photo"></figure>
@@ -19,27 +57,74 @@
     <script>
         function getData(url, onload) {
             ajax = new XMLHttpRequest()
-            ajax.open('GET', url)
+            ajax.open('GET', url, false)
             ajax.onload = onload
             ajax.send()
         }
-        function loadProperties(data) {
-            container = document.querySelector('.properties')
-            property = document.querySelector('.property').cloneNode(true)
+        function loadPrices(properties) {
+            let prices = {}
+            min = properties.reduce((min, item) => min > item.price ? item.price : min, 1000000000);
+            max = properties.reduce((max, item) => max < item.price ? item.price : max, 0);
+
+            let inputs = document.querySelectorAll('input[name="prices[]"]')
+            let isFirst = true
+            inputs.forEach(input => {
+                input.addEventListener('input', () => {
+                    writeLabelPriceRange()
+                    properties.show()
+                })
+                input.setAttribute('min', min)
+                input.setAttribute('max', max)
+                input.setAttribute('value', isFirst ? min : max)
+                isFirst = false
+            });
+
+
+            function writeLabelPriceRange() {
+                inputs = document.querySelectorAll('input[name="prices[]"]')
+                values = []
+                inputs.forEach(input => values.push(Number.parseInt(input.value)))
+                values = values.sort((a, b) => a - b)
+                prices.min = values[0]
+                prices.max = values[1]
+                document.querySelector('.price_range').textContent = `R$ ${Number.parseInt(prices.min)} - R$ ${Number.parseInt(prices.max)}`
+            }
+            writeLabelPriceRange()
+
+            return prices
+        }
+
+        function loadProperties(properties) {
+            let container = document.querySelector('.properties')
+            let propertyDom = document.querySelector('.property').cloneNode(true)
             document.querySelector('.property').remove();
 
-            data.forEach(item => {
-                clone = property.cloneNode(true)
-                clone.querySelector('.photo').style.backgroundImage = `url(${item.photo})`
-                clone.querySelector('.property_type').textContent = item.property_type
-                clone.querySelector('.name').textContent = item.name
-                clone.querySelector('.price').textContent = item.price
-                container.append(clone)
-            });
+            properties = properties.map(property => {
+                property = Object.assign(propertyDom.cloneNode(true), property)
+                property.querySelector('.photo').style.backgroundImage = `url(${property.photo})`
+                property.querySelector('.property_type').textContent = property.property_type
+                property.querySelector('.name').textContent = property.name
+                property.querySelector('.price').textContent = property.price
+                container.append(property)
+                return property
+            })
+
+            properties.show = () => {
+                properties.forEach(property => {
+                    property.style.display = properties.filter(property) ? 'initial' : 'none'
+                });
+            }
+
+            properties.filter = property => {
+                return property.price >= prices.min && property.price <= prices.max
+            }
+
+            prices = loadPrices(properties)
         }
         getData('https://api.sheety.co/30b6e400-9023-4a15-8e6c-16aa4e3b1e72', () => {
             loadProperties(JSON.parse(ajax.response))
         })
     </script>
 </body>
+
 </html>
