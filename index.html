@@ -6,6 +6,16 @@
     <title>AirBnb - Gama Academy</title>
 </head>
 <body>
+    <div class="properties">
+        <div class="property">
+            <figure class="photo"></figure>
+            <div class="info">
+                <h4 class="property_type"></h4>
+                <h3 class="name"></h3>
+                <span class="price"></span>
+            </div>
+        </div>
+    </div>
     <script>
         function getData(url, onload) {
             ajax = new XMLHttpRequest()
@@ -13,8 +23,22 @@
             ajax.onload = onload
             ajax.send()
         }
+        function loadProperties(data) {
+            container = document.querySelector('.properties')
+            property = document.querySelector('.property').cloneNode(true)
+            document.querySelector('.property').remove();
+
+            data.forEach(item => {
+                clone = property.cloneNode(true)
+                clone.querySelector('.photo').style.backgroundImage = `url(${item.photo})`
+                clone.querySelector('.property_type').textContent = item.property_type
+                clone.querySelector('.name').textContent = item.name
+                clone.querySelector('.price').textContent = item.price
+                container.append(clone)
+            });
+        }
         getData('https://api.sheety.co/30b6e400-9023-4a15-8e6c-16aa4e3b1e72', () => {
-            console.log(JSON.parse(ajax.response))
+            loadProperties(JSON.parse(ajax.response))
         })
     </script>
 </body>
