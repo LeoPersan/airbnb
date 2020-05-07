@@ -30,7 +30,7 @@ Na próxima semana, nosso conteúdo técnico será uma live onde o professor far
 
 ## Passos
 
-[ ] Consumir API de exemplo
+[x] Consumir API de exemplo
 [ ] Exibir dados na tela
 [ ] Filtro por preço
 [ ] Valor total
