@@ -61,9 +61,11 @@
         </div>
     </div>
     <script>
-        function getData(url, onload) {
+        function getData(data, onload) {
+            if (typeof data == 'object')
+                return onload(data)
             ajax = new XMLHttpRequest()
-            ajax.open('GET', url, false)
+            ajax.open('GET', data, false)
             ajax.onload = onload
             ajax.send()
         }
@@ -161,6 +163,10 @@
 
             properties = properties.map(property => {
                 property = Object.assign(propertyDom.cloneNode(true), property)
+                property.photo = property.photos[0].large ?? property.photo
+                property.property_type = property.room_and_property_type ?? property.property_type
+                property.price = property.price_rate ?? property.price
+
                 property.querySelector('.photo').style.backgroundImage = `url(${property.photo})`
                 property.querySelector('.property_type').textContent = property.property_type
                 property.querySelector('.name').textContent = property.name
@@ -182,7 +188,7 @@
             prices = loadPrices(properties)
             loadDates(properties)
         }
-        getData('https://api.sheety.co/30b6e400-9023-4a15-8e6c-16aa4e3b1e72', () => {
+        getData('https://leopersan.github.io/airbnb/data.json', () => {
             loadProperties(JSON.parse(ajax.response))
         })
     </script>
