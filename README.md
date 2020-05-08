@@ -35,6 +35,6 @@ Na próxima semana, nosso conteúdo técnico será uma live onde o professor far
 [x] Filtro por preço
 [x] Valor total
 [x] Nova API
-[ ] Exibir mapa
+[x] Exibir mapa
 [ ] Ordenar por localização do dispositivo
 [ ] Filtrar por localização digitada

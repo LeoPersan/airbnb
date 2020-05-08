@@ -6,6 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AirBnb - Gama Academy</title>
     <style>
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            height: 100%;
+        }
+        
         .prices {
             position: relative;
         }
@@ -60,6 +72,7 @@
             </div>
         </div>
     </div>
+    <div id="map"></div>
     <script>
         function getData(data, onload) {
             if (typeof data == 'object')
@@ -75,29 +88,29 @@
 
             function subOneDay(date = '') {
                 date = date.length == 0 ? new Date() : new Date(date)
-                date.setDate(date.getDate()-1)
+                date.setDate(date.getDate() - 1)
                 return date
             }
 
             function sumOneDay(date = '') {
                 date = date.length == 0 ? new Date() : new Date(date)
-                date.setDate(date.getDate()+1)
+                date.setDate(date.getDate() + 1)
                 return date
             }
 
             function sumOneYear(date = '') {
                 date = date.length == 0 ? new Date() : new Date(date)
-                date.setFullYear(date.getFullYear()+1)
+                date.setFullYear(date.getFullYear() + 1)
                 return date
             }
 
             function calcPropertiesTotalPrice(date1 = '', date2 = '') {
                 date1 = date1.length == 0 ? new Date() : new Date(date1)
                 date2 = date2.length == 0 ? new Date() : new Date(date2)
-                days = Math.ceil((date1-date2) / (1000 * 60 * 60 * 24))
+                days = Math.ceil((date1 - date2) / (1000 * 60 * 60 * 24))
                 days = days < 1 ? 1 : days
                 properties.forEach(property => {
-                    property.totalPrice = days*property.price
+                    property.totalPrice = days * property.price
                     property.querySelector('.total_price').textContent = `R$ ${property.totalPrice.toFixed(2)}`
                 });
             }
@@ -105,7 +118,7 @@
             today = new Date().toISOString().split('T')[0]
             tomorrow = sumOneDay(today).toISOString().split('T')[0]
             nextYear = sumOneYear(today).toISOString().split('T')[0]
-            
+
             checkin.setAttribute('min', today)
             checkin.setAttribute('max', nextYear)
             checkin.addEventListener('change', () => {
@@ -113,7 +126,7 @@
                 checkout.setAttribute('max', sumOneYear(checkin.value).toISOString().split('T')[0])
                 calcPropertiesTotalPrice(checkout.value, checkin.value)
             })
-            
+
             checkout.setAttribute('min', tomorrow)
             checkout.setAttribute('max', nextYear)
             checkout.addEventListener('change', () => {
@@ -161,11 +174,15 @@
             let propertyDom = document.querySelector('.property').cloneNode(true)
             document.querySelector('.property').remove();
 
+            center = { lat: 0, lng: 0 }
             properties = properties.map(property => {
                 property = Object.assign(propertyDom.cloneNode(true), property)
                 property.photo = property.photos[0].large ?? property.photo
                 property.property_type = property.room_and_property_type ?? property.property_type
                 property.price = property.price_rate ?? property.price
+                property.location = { lat: property.latitude, lng: property.longitude }
+                center.lat += property.latitude
+                center.lng += property.longitude
 
                 property.querySelector('.photo').style.backgroundImage = `url(${property.photo})`
                 property.querySelector('.property_type').textContent = property.property_type
@@ -174,6 +191,9 @@
                 container.append(property)
                 return property
             })
+            center.lat /= properties.length
+            center.lng /= properties.length
+            properties.center = center
 
             properties.show = () => {
                 properties.forEach(property => {
@@ -187,11 +207,26 @@
 
             prices = loadPrices(properties)
             loadDates(properties)
+            return properties
         }
+        let properties
         getData('https://leopersan.github.io/airbnb/data.json', () => {
-            loadProperties(JSON.parse(ajax.response))
+            properties = loadProperties(JSON.parse(ajax.response))
         })
+        var map
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: properties.center,
+                zoom: 15
+            })
+            properties = properties.map(property => {
+                property.marker = new google.maps.Marker({ position: property.location, map: map });
+                return property
+            })
+        }
     </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDe_kjKItx8O1VSZFzRfmTk63TYgEY3yKw&callback=initMap"
+        async defer></script>
 </body>
 
 </html>
