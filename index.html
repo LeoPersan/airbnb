@@ -43,6 +43,11 @@
             <input type="range" name="prices[]">
             <input type="range" name="prices[]">
         </div>
+        <div class="dates">
+            <label>Datas</label>
+            <input type="date" name="checkin">
+            <input type="date" name="checkout">
+        </div>
     </div>
     <div class="properties">
         <div class="property">
@@ -51,6 +56,7 @@
                 <h4 class="property_type"></h4>
                 <h3 class="name"></h3>
                 <span class="price"></span>
+                <span class="total_price"></span>
             </div>
         </div>
     </div>
@@ -61,6 +67,60 @@
             ajax.onload = onload
             ajax.send()
         }
+        function loadDates(properties) {
+            checkin = document.querySelector('input[name=checkin]')
+            checkout = document.querySelector('input[name=checkout]')
+
+            function subOneDay(date = '') {
+                date = date.length == 0 ? new Date() : new Date(date)
+                date.setDate(date.getDate()-1)
+                return date
+            }
+
+            function sumOneDay(date = '') {
+                date = date.length == 0 ? new Date() : new Date(date)
+                date.setDate(date.getDate()+1)
+                return date
+            }
+
+            function sumOneYear(date = '') {
+                date = date.length == 0 ? new Date() : new Date(date)
+                date.setFullYear(date.getFullYear()+1)
+                return date
+            }
+
+            function calcPropertiesTotalPrice(date1 = '', date2 = '') {
+                date1 = date1.length == 0 ? new Date() : new Date(date1)
+                date2 = date2.length == 0 ? new Date() : new Date(date2)
+                days = Math.ceil((date1-date2) / (1000 * 60 * 60 * 24))
+                days = days < 1 ? 1 : days
+                properties.forEach(property => {
+                    property.totalPrice = days*property.price
+                    property.querySelector('.total_price').textContent = `R$ ${property.totalPrice.toFixed(2)}`
+                });
+            }
+
+            today = new Date().toISOString().split('T')[0]
+            tomorrow = sumOneDay(today).toISOString().split('T')[0]
+            nextYear = sumOneYear(today).toISOString().split('T')[0]
+            
+            checkin.setAttribute('min', today)
+            checkin.setAttribute('max', nextYear)
+            checkin.addEventListener('change', () => {
+                checkout.setAttribute('min', sumOneDay(checkin.value).toISOString().split('T')[0])
+                checkout.setAttribute('max', sumOneYear(checkin.value).toISOString().split('T')[0])
+                calcPropertiesTotalPrice(checkout.value, checkin.value)
+            })
+            
+            checkout.setAttribute('min', tomorrow)
+            checkout.setAttribute('max', nextYear)
+            checkout.addEventListener('change', () => {
+                max = checkout.value.length == 0 ? sumOneYear() : subOneDay(checkout.value)
+                checkin.setAttribute('max', max.toISOString().split('T')[0])
+                calcPropertiesTotalPrice(checkout.value, checkin.value)
+            })
+        }
+
         function loadPrices(properties) {
             let prices = {}
             min = properties.reduce((min, item) => min > item.price ? item.price : min, 1000000000);
@@ -104,7 +164,7 @@
                 property.querySelector('.photo').style.backgroundImage = `url(${property.photo})`
                 property.querySelector('.property_type').textContent = property.property_type
                 property.querySelector('.name').textContent = property.name
-                property.querySelector('.price').textContent = property.price
+                property.querySelector('.price').textContent = `R$ ${property.price.toFixed(2)}`
                 container.append(property)
                 return property
             })
@@ -120,6 +180,7 @@
             }
 
             prices = loadPrices(properties)
+            loadDates(properties)
         }
         getData('https://api.sheety.co/30b6e400-9023-4a15-8e6c-16aa4e3b1e72', () => {
             loadProperties(JSON.parse(ajax.response))

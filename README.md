@@ -33,7 +33,7 @@ Na próxima semana, nosso conteúdo técnico será uma live onde o professor far
 [x] Consumir API de exemplo
 [x] Exibir dados na tela
 [x] Filtro por preço
-[ ] Valor total
+[x] Valor total
 [ ] Nova API
 [ ] Exibir mapa
 [ ] Ordenar por localização do dispositivo
