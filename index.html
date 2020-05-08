@@ -6,73 +6,221 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AirBnb - Gama Academy</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap');
+        html {
+            line-height: 1.15;
+            -webkit-text-size-adjust: 100%;
+        }
 
-        html,
+        body {
+            font-family: Roboto, sans-serif;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin: 0.67em 0;
+        }
+
+        a {
+            background-color: transparent;
+        }
+
+        small {
+            font-size: 80%;
+        }
+
+        sub,
+        sup {
+            font-size: 75%;
+            line-height: 0;
+            position: relative;
+            vertical-align: baseline;
+        }
+
+        sub {
+            bottom: -0.25em;
+        }
+
+        sup {
+            top: -0.5em;
+        }
+
+        img {
+            border-style: none;
+        }
+
+        input {
+            font-family: inherit;
+            font-size: 100%;
+            line-height: 1.15;
+            margin: 0;
+        }
+
+        input {
+            overflow: visible;
+            border-radius: 5px;
+            border: 1px solid #dddddd;
+            padding: 5px;
+        }
+
         body {
             height: 100%;
             margin: 0;
-            padding: 0;
+            padding: 56px 0 0 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        header {
+            padding: 10px;
+            position: fixed;
+            top: 0;
+            width: 100vw;
+            z-index: 1;
+            background: #ffffff;
+        }
+
+        .filters {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .filters label {
+            font-weight: bold;
+        }
+
+        .filters .prices {
+            position: relative;
+            padding: 8px 150px 8px 8px;
+        }
+
+        .filters .prices input[type="range"] {
+            margin: 0 5px;
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+        }
+
+        .filters .prices input[type="range"]::-webkit-slider-thumb {
+            position: relative;
+            pointer-events: all;
+            z-index: 1;
+        }
+
+        .filters .prices input[type="range"]::-moz-range-thumb {
+            position: relative;
+            pointer-events: all;
+            z-index: 1;
+        }
+
+        .filters .prices input[type="range"]::-ms-thumb {
+            position: relative;
+            pointer-events: all;
+            z-index: 1;
+        }
+
+        main {
+            display: flex;
+            position: relative;
         }
 
         #map {
-            height: 100%;
-        }
-        
-        .prices {
-            position: relative;
-        }
-
-        input[type="range"] {
-            position: absolute;
-            pointer-events: none;
+            flex: 1;
+            height: calc(100vh - 56px);
+            width: 50%;
+            position: fixed !important;
+            right: 0;
         }
 
-        input[type="range"]::-webkit-slider-thumb {
-            position: relative;
-            pointer-events: all;
-            z-index: 1;
+        .properties {
+            width: 50%;
         }
 
-        input[type="range"]::-moz-range-thumb {
-            position: relative;
-            pointer-events: all;
-            z-index: 1;
+        .property {
+            display: flex;
+            margin: 10px 5px;
+            height: 180px;
         }
 
-        input[type="range"]::-ms-thumb {
+        .property figure {
+            background-size: cover;
+            background-position: center;
+            margin: 0;
+            width: 250px;
             position: relative;
-            pointer-events: all;
-            z-index: 1;
+            border-radius: 5px;
+        }
+
+        .property .info {
+            width: calc(100% - 270px);
+            padding: 5px 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .property .info .property_type {
+            margin: 5px 0;
+        }
+
+        .property .info .name {
+            margin: 5px 0;
+        }
+
+        .property .info .price {
+        }
+
+        .property .info .total_price {
         }
     </style>
 </head>
 
 <body>
-    <div class="filters">
-        <div class="prices">
-            <label>Preços</label>
-            <span class="price_range"></span>
-            <input type="range" name="prices[]">
-            <input type="range" name="prices[]">
-        </div>
-        <div class="dates">
-            <label>Datas</label>
-            <input type="date" name="checkin">
-            <input type="date" name="checkout">
-        </div>
-    </div>
-    <div class="properties">
-        <div class="property">
-            <figure class="photo"></figure>
-            <div class="info">
-                <h4 class="property_type"></h4>
-                <h3 class="name"></h3>
-                <span class="price"></span>
-                <span class="total_price"></span>
+    <header>
+        <div class="filters">
+            <div class="dates">
+                <label>Datas : </label>
+                <input type="date" name="checkin">
+                <input type="date" name="checkout">
+            </div>
+            <div class="prices">
+                <label>Preços : </label>
+                <span class="price_range"></span>
+                <input type="range" name="prices[]">
+                <input type="range" name="prices[]">
             </div>
         </div>
-    </div>
-    <div id="map"></div>
+    </header>
+    <main>
+        <div class="properties">
+            <div class="property">
+                <figure class="photo"></figure>
+                <div class="info">
+                    <div>
+                        <h4 class="property_type"></h4>
+                        <h3 class="name"></h3>
+                    </div>
+                    <div class="prices">
+                        <span class="price"></span>
+                        <span class="total_price"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="map"></div>
+    </main>
+    <script>
+        var map
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), { zoom: 10 })
+        }
+    </script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDe_kjKItx8O1VSZFzRfmTk63TYgEY3yKw&callback=initMap"></script>
     <script>
         function getData(data, onload) {
             if (typeof data == 'object')
@@ -169,7 +317,7 @@
             return prices
         }
 
-        function loadProperties(properties) {
+        loadProperties = (properties) => {
             let container = document.querySelector('.properties')
             let propertyDom = document.querySelector('.property').cloneNode(true)
             document.querySelector('.property').remove();
@@ -180,9 +328,9 @@
                 property.photo = property.photos[0].large ?? property.photo
                 property.property_type = property.room_and_property_type ?? property.property_type
                 property.price = property.price_rate ?? property.price
-                property.location = { lat: property.latitude, lng: property.longitude }
                 center.lat += property.latitude
                 center.lng += property.longitude
+                property.marker = new window.google.maps.Marker({ position: { lat: property.latitude, lng: property.longitude }, map: map });
 
                 property.querySelector('.photo').style.backgroundImage = `url(${property.photo})`
                 property.querySelector('.property_type').textContent = property.property_type
@@ -193,11 +341,12 @@
             })
             center.lat /= properties.length
             center.lng /= properties.length
-            properties.center = center
+            map.setCenter(center)
 
             properties.show = () => {
                 properties.forEach(property => {
-                    property.style.display = properties.filter(property) ? 'initial' : 'none'
+                    property.style.display = properties.filter(property) ? 'flex' : 'none'
+                    property.marker.setMap(properties.filter(property) ? map : null)
                 });
             }
 
@@ -207,26 +356,11 @@
 
             prices = loadPrices(properties)
             loadDates(properties)
-            return properties
         }
-        let properties
         getData('https://leopersan.github.io/airbnb/data.json', () => {
-            properties = loadProperties(JSON.parse(ajax.response))
+            loadProperties(JSON.parse(ajax.response))
         })
-        var map
-        function initMap() {
-            map = new google.maps.Map(document.getElementById('map'), {
-                center: properties.center,
-                zoom: 15
-            })
-            properties = properties.map(property => {
-                property.marker = new google.maps.Marker({ position: property.location, map: map });
-                return property
-            })
-        }
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDe_kjKItx8O1VSZFzRfmTk63TYgEY3yKw&callback=initMap"
-        async defer></script>
 </body>
 
 </html>
