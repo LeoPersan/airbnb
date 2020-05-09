@@ -355,14 +355,11 @@
             let propertyDom = document.querySelector('.property').cloneNode(true)
             document.querySelector('.property').remove();
 
-            center = { lat: 0, lng: 0 }
             properties = properties.map(property => {
                 property = Object.assign(propertyDom.cloneNode(true), property)
                 property.photo = property.photos[0].large ?? property.photo
                 property.property_type = property.room_and_property_type ?? property.property_type
                 property.price = property.price_rate ?? property.price
-                center.lat += property.latitude
-                center.lng += property.longitude
 
                 property.querySelector('.photo').style.backgroundImage = `url(${property.photo})`
                 property.querySelector('.property_type').textContent = property.property_type
@@ -371,16 +368,12 @@
                 return property
             })
 
-            properties.show = () => {
-                properties.forEach(property => {
-                    property.style.display = properties.filter(property) ? 'flex' : 'none'
-                    property.marker.setMap(properties.filter(property) ? map : null)
-                });
-            }
+            properties.show = () => properties.forEach(property => {
+                property.style.display = properties.filter(property) ? 'flex' : 'none'
+                property.marker.setMap(properties.filter(property) ? map : null)
+            })
 
-            properties.filter = property => {
-                return property.price >= prices.min && property.price <= prices.max
-            }
+            properties.filter = property => property.price >= prices.min && property.price <= prices.max
 
             if ("geolocation" in navigator) properties = await orderByGeoLocation(properties)
             properties.map(property => container.append(property))
