@@ -37,5 +37,5 @@ Na próxima semana, nosso conteúdo técnico será uma live onde o professor far
 [x] Nova API
 [x] Exibir mapa
 [x] Primeira Estilização
-[ ] Ordenar por localização do dispositivo
-[ ] Filtrar por localização digitada
+[x] Ordenar pela localização do dispositivo
+[ ] Estilização Final

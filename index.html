@@ -317,7 +317,27 @@
             return prices
         }
 
-        loadProperties = (properties) => {
+        async function orderByGeoLocation(properties) {
+            function getCoordinates() {
+                return new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject)
+                })
+            }
+            try {
+                userLocation = await getCoordinates()
+                userLocation = userLocation.coords
+                properties = properties.map(property => {
+                    property.distance = ((userLocation.latitude-property.latitude)**2)+((userLocation.longitude-property.longitude)**2)
+                    return property
+                })
+                properties = properties.sort((a,b) => a.distance-b.distance)
+            } catch (error) {
+                console.log(error)
+            }
+            return properties
+        }
+
+        async function loadProperties(properties) {
             let container = document.querySelector('.properties')
             let propertyDom = document.querySelector('.property').cloneNode(true)
             document.querySelector('.property').remove();
@@ -336,12 +356,15 @@
                 property.querySelector('.property_type').textContent = property.property_type
                 property.querySelector('.name').textContent = property.name
                 property.querySelector('.price').textContent = `R$ ${property.price.toFixed(2)}`
-                container.append(property)
                 return property
             })
             center.lat /= properties.length
             center.lng /= properties.length
             map.setCenter(center)
+
+            if ("geolocation" in navigator) properties = await orderByGeoLocation(properties)
+
+            properties.map(property => container.append(property))
 
             properties.show = () => {
                 properties.forEach(property => {
