@@ -219,8 +219,7 @@
             map = new google.maps.Map(document.getElementById('map'), { zoom: 10 })
         }
     </script>
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDe_kjKItx8O1VSZFzRfmTk63TYgEY3yKw&callback=initMap"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDe_kjKItx8O1VSZFzRfmTk63TYgEY3yKw&callback=initMap"></script>
     <script>
         function getData(data, onload) {
             if (typeof data == 'object')
@@ -230,6 +229,7 @@
             ajax.onload = onload
             ajax.send()
         }
+
         function loadDates(properties) {
             checkin = document.querySelector('input[name=checkin]')
             checkout = document.querySelector('input[name=checkout]')
@@ -337,6 +337,19 @@
             return properties
         }
 
+        function setMarkersOnMap(properties) {
+            center = properties.reduce((total, property) => {
+                property.marker = new window.google.maps.Marker({ position: { lat: property.latitude, lng: property.longitude }, map: map })
+                return {
+                    lat: total.lat + property.latitude,
+                    lng: total.lng + property.longitude,
+                }
+            },{lat: 0,lng: 0})
+            center.lat /= properties.length
+            center.lng /= properties.length
+            map.setCenter(center)
+        }
+
         async function loadProperties(properties) {
             let container = document.querySelector('.properties')
             let propertyDom = document.querySelector('.property').cloneNode(true)
@@ -350,7 +363,6 @@
                 property.price = property.price_rate ?? property.price
                 center.lat += property.latitude
                 center.lng += property.longitude
-                property.marker = new window.google.maps.Marker({ position: { lat: property.latitude, lng: property.longitude }, map: map });
 
                 property.querySelector('.photo').style.backgroundImage = `url(${property.photo})`
                 property.querySelector('.property_type').textContent = property.property_type
@@ -358,13 +370,6 @@
                 property.querySelector('.price').textContent = `R$ ${property.price.toFixed(2)}`
                 return property
             })
-            center.lat /= properties.length
-            center.lng /= properties.length
-            map.setCenter(center)
-
-            if ("geolocation" in navigator) properties = await orderByGeoLocation(properties)
-
-            properties.map(property => container.append(property))
 
             properties.show = () => {
                 properties.forEach(property => {
@@ -377,6 +382,9 @@
                 return property.price >= prices.min && property.price <= prices.max
             }
 
+            if ("geolocation" in navigator) properties = await orderByGeoLocation(properties)
+            properties.map(property => container.append(property))
+            setMarkersOnMap(properties)
             prices = loadPrices(properties)
             loadDates(properties)
         }
