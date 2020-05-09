@@ -10,6 +10,7 @@
         html {
             line-height: 1.15;
             -webkit-text-size-adjust: 100%;
+            scroll-behavior: smooth;
         }
 
         body {
@@ -25,26 +26,11 @@
 
         a {
             background-color: transparent;
+            text-decoration: none;
         }
 
         small {
             font-size: 80%;
-        }
-
-        sub,
-        sup {
-            font-size: 75%;
-            line-height: 0;
-            position: relative;
-            vertical-align: baseline;
-        }
-
-        sub {
-            bottom: -0.25em;
-        }
-
-        sup {
-            top: -0.5em;
         }
 
         img {
@@ -155,6 +141,12 @@
             border-radius: 5px;
         }
 
+        .property figure a {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
         .property .info {
             width: calc(100% - 270px);
             padding: 5px 10px;
@@ -165,16 +157,20 @@
 
         .property .info .property_type {
             margin: 5px 0;
+            color: black;
         }
 
         .property .info .name {
             margin: 5px 0;
+            color: black;
         }
 
-        .property .info .price {
+        .property .anchor {
+            margin-top: -56px;
         }
 
-        .property .info .total_price {
+        .property .link {
+            display: block;
         }
     </style>
 </head>
@@ -198,17 +194,23 @@
     <main>
         <div class="properties">
             <div class="property">
-                <figure class="photo"></figure>
-                <div class="info">
-                    <div>
-                        <h4 class="property_type"></h4>
-                        <h3 class="name"></h3>
+                <a class="anchor"></a>
+                    <figure class="photo">
+                        <a class="link" target="_blank"></a>
+                    </figure>
+                    <div class="info">
+                        <div>
+                            <a class="link" target="_blank">
+                                <h4 class="property_type"></h4>
+                                <h3 class="name"></h3>
+                            </a>
+                        </div>
+                        <div class="prices">
+                            <span class="price"></span>
+                            <span class="total_price"></span>
+                        </div>
                     </div>
-                    <div class="prices">
-                        <span class="price"></span>
-                        <span class="total_price"></span>
-                    </div>
-                </div>
+                </a>
             </div>
         </div>
         <div id="map"></div>
@@ -339,7 +341,45 @@
 
         function setMarkersOnMap(properties) {
             center = properties.reduce((total, property) => {
-                property.marker = new window.google.maps.Marker({ position: { lat: property.latitude, lng: property.longitude }, map: map })
+                property.marker = new window.google.maps.Marker({
+                    position: { lat: property.latitude, lng: property.longitude },
+                    map: map,
+                    icon: new window.google.maps.MarkerImage(
+                        'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Google_Maps_pin.svg/274px-Google_Maps_pin.svg.png',
+                        null,
+                        null,
+                        null,
+                        new google.maps.Size(24, 42)
+                    )
+                })
+
+                mouseover = () => {
+                    property.marker.setIcon(new window.google.maps.MarkerImage(
+                        'https://lh3.googleusercontent.com/proxy/_nqv8zhq8s5wYlUw-trY6MniZwbzfg2Ue0aUA4HrR4PrUrovANqqaQQbnXmHSKe-2RScKrxqmwsF7r5yu7NJi10EOVwNb4xgheeomNdOQoDuDbmen2fV1jU',
+                        null,
+                        null,
+                        null,
+                        new google.maps.Size(35, 55)
+                    ))
+                }
+
+                mouseout = () => {
+                    property.marker.setIcon(new window.google.maps.MarkerImage(
+                        'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Google_Maps_pin.svg/274px-Google_Maps_pin.svg.png',
+                        null,
+                        null,
+                        null,
+                        new google.maps.Size(24, 42)
+                    ))
+                }
+
+                window.google.maps.event.addListener(property.marker,'click', () => {
+                    window.location.hash = property.slug
+                })
+                window.google.maps.event.addListener(property.marker,'mouseover', mouseover)
+                window.google.maps.event.addListener(property.marker,'mouseout', mouseout)
+                property.addEventListener('mouseover', mouseover)
+                property.addEventListener('mouseout', mouseout)
                 return {
                     lat: total.lat + property.latitude,
                     lng: total.lng + property.longitude,
@@ -348,6 +388,23 @@
             center.lat /= properties.length
             center.lng /= properties.length
             map.setCenter(center)
+        }
+
+        function str_slug(str) {
+            str = str.replace(/^\s+|\s+$/g, '')
+            str = str.toLowerCase()
+
+            var from = "àáãäâèéëêìíïîòóöôùúüûñç·/_,:;"
+            var to   = "aaaaaeeeeiiiioooouuuunc------"
+            for (var i=0, l=from.length ; i<l ; i++) {
+                str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i))
+            }
+
+            str = str.replace(/[^a-z0-9 -]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+
+            return str;
         }
 
         async function loadProperties(properties) {
@@ -360,13 +417,20 @@
                 property.photo = property.photos[0].large ?? property.photo
                 property.property_type = property.room_and_property_type ?? property.property_type
                 property.price = property.price_rate ?? property.price
+                property.slug = str_slug(property.name)
 
+                property.querySelectorAll('.link').forEach(link => {
+                    link.href = property.url
+                })
+                property.querySelector('.anchor').name = property.slug
                 property.querySelector('.photo').style.backgroundImage = `url(${property.photo})`
                 property.querySelector('.property_type').textContent = property.property_type
                 property.querySelector('.name').textContent = property.name
                 property.querySelector('.price').textContent = `R$ ${property.price.toFixed(2)}`
                 return property
             })
+
+            if ("geolocation" in navigator) properties = await orderByGeoLocation(properties)
 
             properties.show = () => properties.forEach(property => {
                 property.style.display = properties.filter(property) ? 'flex' : 'none'
@@ -375,12 +439,13 @@
 
             properties.filter = property => property.price >= prices.min && property.price <= prices.max
 
-            if ("geolocation" in navigator) properties = await orderByGeoLocation(properties)
+            console.log(properties)
             properties.map(property => container.append(property))
             setMarkersOnMap(properties)
             prices = loadPrices(properties)
             loadDates(properties)
         }
+
         getData('https://leopersan.github.io/airbnb/data.json', () => {
             loadProperties(JSON.parse(ajax.response))
         })
