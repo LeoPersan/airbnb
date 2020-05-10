@@ -40,4 +40,4 @@ Na próxima semana, nosso conteúdo técnico será uma live onde o professor far
 [x] Ordenar pela localização do dispositivo
 [x] Eventos de mouse na lista e nos marcadores no mapa
 [x] Centralizar melhor as marcações no mapa
-[ ] Estilização Final
+[x] Estilização Final

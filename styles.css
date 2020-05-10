@@ -1,0 +1,211 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap");
+@import url("https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css");
+html {
+    line-height: 1.15;
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Roboto, sans-serif;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+h1 {
+    font-size: 2em;
+    margin: 0.67em 0;
+}
+
+a {
+    background-color: transparent;
+    text-decoration: none;
+}
+
+small {
+    font-size: 80%;
+}
+
+img {
+    border-style: none;
+}
+
+input {
+    font-family: inherit;
+    font-size: 100%;
+    line-height: 1.15;
+    margin: 0;
+}
+
+input {
+    overflow: visible;
+    border-radius: 30px;
+    border: 1px solid #dddddd;
+    padding: 5px 20px;
+}
+
+body {
+    height: 100%;
+    margin: 0;
+    padding: 56px 0 0 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+header {
+    padding: 10px;
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    z-index: 1;
+    background: #ffffff;
+    border-bottom: 1px solid #dddddd;
+}
+
+.filters {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.filters label {
+    font-weight: bold;
+}
+
+.filters .prices {
+    position: relative;
+    padding: 8px 185px 8px 8px;
+}
+
+.filters .prices input[type="range"] {
+    margin: 0 5px;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+}
+
+.filters .prices input[type="range"]::-webkit-slider-thumb {
+    position: relative;
+    pointer-events: all;
+    z-index: 1;
+}
+
+.filters .prices input[type="range"]::-moz-range-thumb {
+    position: relative;
+    pointer-events: all;
+    z-index: 1;
+}
+
+.filters .prices input[type="range"]::-ms-thumb {
+    position: relative;
+    pointer-events: all;
+    z-index: 1;
+}
+
+main {
+    display: flex;
+    position: relative;
+}
+
+#map {
+    flex: 1;
+    height: calc(100vh - 56px);
+    width: 50%;
+    position: fixed !important;
+    right: 0;
+}
+
+.properties {
+    width: 50%;
+}
+
+.property {
+    position: relative;
+    display: flex;
+    margin: 10px 5px;
+    height: 180px;
+    box-shadow: 0 2px 4px gray;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.property figure {
+    background-size: cover;
+    background-position: center;
+    margin: 0;
+    width: 250px;
+    position: relative;
+}
+
+.property figure a {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.property .anchor {
+    position: absolute;
+    top: -56px;
+}
+
+.property .link {
+    display: block;
+}
+
+.property .info {
+    width: calc(100% - 270px);
+    padding: 5px 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.property .info * {
+    color: #006c70;
+}
+
+.property .info .stars {
+    float: right;
+    font-size: 13px;
+    color: #222222;
+}
+
+.property .info .stars .fa-star {
+    color: #FF385C;
+}
+
+.property .info .stars .rate {
+    color: #222222;
+}
+
+.property .info .property_type {
+    margin: 5px 0;
+    font-weight: normal;
+}
+
+.property .info .name {
+    margin: 10px 0;
+    color: #222222;
+    font-weight: normal;
+}
+
+.property .info .prices * {
+    float: right;
+}
+
+.property .info .price {
+    font-weight: bold;
+}
+
+.property .info .price_type {
+
+}
+
+.property .info .total_price {
+    opacity: 0;
+}
+
+.property .info .total_price .value {
+    font-weight: bold;
+}
