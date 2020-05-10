@@ -218,7 +218,7 @@
     <script>
         var map
         function initMap() {
-            map = new google.maps.Map(document.getElementById('map'), { zoom: 10 })
+            map = new google.maps.Map(document.getElementById('map'))
         }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDe_kjKItx8O1VSZFzRfmTk63TYgEY3yKw&callback=initMap"></script>
@@ -340,38 +340,33 @@
         }
 
         function setMarkersOnMap(properties) {
-            center = properties.reduce((total, property) => {
+            let sw = {lat: 90,lng: 180}
+            let ne = {lat: -90,lng: -180}
+            let iconDefault = new window.google.maps.MarkerImage(
+                'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Google_Maps_pin.svg/274px-Google_Maps_pin.svg.png',
+                null,
+                null,
+                null,
+                new google.maps.Size(24, 42)
+            )
+            let iconOver = new window.google.maps.MarkerImage(
+                'https://lh3.googleusercontent.com/proxy/_nqv8zhq8s5wYlUw-trY6MniZwbzfg2Ue0aUA4HrR4PrUrovANqqaQQbnXmHSKe-2RScKrxqmwsF7r5yu7NJi10EOVwNb4xgheeomNdOQoDuDbmen2fV1jU',
+                null,
+                null,
+                null,
+                new google.maps.Size(35, 55)
+            )
+
+            properties.forEach(property => {
+                mouseover = () => property.marker.setIcon(iconOver)
+                mouseout = () => property.marker.setIcon(iconDefault)
+
                 property.marker = new window.google.maps.Marker({
                     position: { lat: property.latitude, lng: property.longitude },
                     map: map,
-                    icon: new window.google.maps.MarkerImage(
-                        'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Google_Maps_pin.svg/274px-Google_Maps_pin.svg.png',
-                        null,
-                        null,
-                        null,
-                        new google.maps.Size(24, 42)
-                    )
+                    icon: iconDefault
                 })
 
-                mouseover = () => {
-                    property.marker.setIcon(new window.google.maps.MarkerImage(
-                        'https://lh3.googleusercontent.com/proxy/_nqv8zhq8s5wYlUw-trY6MniZwbzfg2Ue0aUA4HrR4PrUrovANqqaQQbnXmHSKe-2RScKrxqmwsF7r5yu7NJi10EOVwNb4xgheeomNdOQoDuDbmen2fV1jU',
-                        null,
-                        null,
-                        null,
-                        new google.maps.Size(35, 55)
-                    ))
-                }
-
-                mouseout = () => {
-                    property.marker.setIcon(new window.google.maps.MarkerImage(
-                        'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Google_Maps_pin.svg/274px-Google_Maps_pin.svg.png',
-                        null,
-                        null,
-                        null,
-                        new google.maps.Size(24, 42)
-                    ))
-                }
 
                 window.google.maps.event.addListener(property.marker,'click', () => {
                     window.location.hash = property.slug
@@ -380,14 +375,18 @@
                 window.google.maps.event.addListener(property.marker,'mouseout', mouseout)
                 property.addEventListener('mouseover', mouseover)
                 property.addEventListener('mouseout', mouseout)
-                return {
-                    lat: total.lat + property.latitude,
-                    lng: total.lng + property.longitude,
-                }
-            },{lat: 0,lng: 0})
-            center.lat /= properties.length
-            center.lng /= properties.length
-            map.setCenter(center)
+                
+                sw.lat = sw.lat > property.latitude ? property.latitude : sw.lat
+                sw.lng = sw.lng > property.longitude ? property.longitude : sw.lng
+
+                ne.lat = ne.lat < property.latitude ? property.latitude : ne.lat
+                ne.lng = ne.lng < property.longitude ? property.longitude : ne.lng
+            }) 
+            sw.lat += 0.01
+            sw.lng += 0.01
+            ne.lat -= 0.01
+            ne.lng -= 0.01
+            map.fitBounds(new google.maps.LatLngBounds(sw,ne))
         }
 
         function str_slug(str) {
@@ -439,7 +438,6 @@
 
             properties.filter = property => property.price >= prices.min && property.price <= prices.max
 
-            console.log(properties)
             properties.map(property => container.append(property))
             setMarkersOnMap(properties)
             prices = loadPrices(properties)
